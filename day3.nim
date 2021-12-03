@@ -23,22 +23,62 @@ proc flip(num: string): string =
       of '0': result &= "1"
       else: echo "non binary number in string"
 
-proc findClosestMatch(needle: string, stack: seq[string]): uint =
-  var prefix = needle
-  while prefix != "":
-    let matches = stack.filterIt(it.startsWith(prefix))
-    if matches.len() == 1:
-      return fromBin[uint](matches[0])
-    let last = prefix.len()-1
-    prefix.delete(last..last)
-  
+proc findOxygenRating(data: seq[string]): uint =
+  var curPlace = 0
+  var candidates = data
+
+  while len(candidates) > 1:
+    var zeroes, ones: int
+    for line in 0..<len(candidates):
+      case candidates[line][curplace]
+        of '1': ones += 1
+        of '0': zeroes += 1
+        else: echo "non binary number in string"
+    var test: char
+    if ones >= zeroes:
+      test = '1'
+    else:
+      test = '0'
+
+    candidates = candidates.filterIt(it[curPlace] == test)
+    curPlace += 1
+
+  return fromBin[uint](candidates[0])
+      
+
+proc findCo2Rating(data: seq[string]): uint =
+  var curPlace = 0
+  var candidates = data
+
+  while len(candidates) > 1:
+    var zeroes, ones: int
+    for line in 0..<len(candidates):
+      case candidates[line][curplace]
+        of '1': ones += 1
+        of '0': zeroes += 1
+        else: echo "non binary number in string"
+    var test: char
+    if zeroes <= ones:
+      test = '0'
+    else:
+      test = '1'
+
+    candidates = candidates.filterIt(it[curPlace] == test)
+    curPlace += 1
+
+  return fromBin[uint](candidates[0])
+
 
 proc part1(data: seq[string]): uint =
   let gamma = calculateGamma(data)
   let epsilon = flip(gamma)
   fromBin[uint](gamma) * fromBin[uint](epsilon)
 
+proc part2(data: seq[string]): uint =
+  let oxygen = findOxygenRating(data)
+  let co2 = findCo2Rating(data)
+  result = oxygen * co2
 
-let data = readFile("day3t.txt").strip().splitLines()
+let data = readFile("day3.txt").strip().splitLines()
 echo "Part1: ", part1(data)
-echo findClosestMatch("test", data)
+echo "Part2: ", part2(data)
